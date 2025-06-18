@@ -2,73 +2,67 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-int power(int a, int b, int m)
+long long power(long long a, long long b, long long p)
 {
-    int f = 1;
-    a = a%m; //rut gon cho so a cho mod m
-    while(b>0)
+    long long f =1;
+    a =a%p;
+    while (b>0)
     {
-        if(b %2==1)
-            f = (f*a*1LL)%m;
-        a = (a*a*1LL)%m;
+        if(b&1)
+            f=(f*a)%p;
+        a = (a*a)%p;
         b=b/2;
     }
     return f;
-
-
 }
 
-//tim nghich dao cua e trong truong mod n
-int e_nghich(int e, int phi)
+long long nghich(long long a, long long n)
 {
-    for(int d = 2;d<phi;d++)
-        if((d*e)%phi==1)
-            return d;
+    for(int i=2;i<n;i++)
+        if((a*i)%n==1)
+            return i;
     return -1;
 }
 
-//tao khoa RSA
-void taoKhoa(int &e, int &d, int p, int q)
+bool check_snt(long long a)
 {
-    int phi_n = (p-1)*(q-1);
-
-    //chon e sao cho 1<e<phi_n va gcd(e,phi_n)=1
-    for(e =2 ;e<phi_n;e++)
+    if(a<2)
+        return false;
+    else
     {
-        if(__gcd(e,phi_n)==1)
-            break;
+        for(int i=2;i<=sqrt(a);i++)
+            if(a%i==0)
+                return false;
+        return true;
     }
 
-    //tim d la nghich dao cua e trong mod phi_n
-    d = e_nghich(e,phi_n);
 }
 
-int maHoa(int m, int e, int n)
+void taoKhoa(long long &e, long long &d ,long long p, long long q)
+{
+    long long phi_n =(p-1)*(q-1);
+    for(e =2;e<phi_n;e++)
+        if(__gcd(e,phi_n)==1)
+            break;
+
+    d = nghich(e,phi_n);
+
+
+}
+long long maHoa(long long m, long long e, long long n)
 {
     return power(m,e,n);
 }
 
-int giaiMa(int c, int d, int n)
+long long giaiMa(long long c,long long d, long long n)
 {
     return power(c,d,n);
 }
 
-bool isPrime(int n)
-{
-    if(n<2)
-        return false;
-    else
-    {
-        for(int i=2;i<=sqrt(n);i++)
-            if(n%i==0)
-                return false;
-        return true;
-    }
-}
-
 int main()
 {
-    int p, q;
+
+    long long p,  q;
     do
     {
     cout<<"nhap so nguyen to p:";
@@ -77,30 +71,41 @@ int main()
     cout<<"nhap so nguyen to q:";
     cin>>q;
     }
-    while(!isPrime(p) || !isPrime(q) ||(p==q));
+    while(!check_snt(p) || !check_snt(q) ||(p==q));
 
-    int n=p*q;
+    long long n = p*q;
 
-
-    int e,d;
+    long long e,d;
     taoKhoa(e,d,p,q);
 
-    cout<<"khoa cong khai (e="<<e<<",n="<<n<<")"<<endl;
-    cout<<"khoa bi mat (d="<<d<<",n="<<n<<")"<<endl;
+    string s;
+    cin.ignore();
+    cout<<"nhap thong diep:";
+    getline(cin,s);
 
-    int m;
-
-    do
+    vector <long long> mess;
+    vector <long long> banMo;
+    vector <long long> banRo;
+    for(char m:s)
+        mess.push_back((long long)m);
+    for(long long m:mess)
     {
-        cout<<"nhap ban ro m<"<<n<<":";
-        cin>>m;
-    }
-    while (m>=n);
+        long long c = maHoa(m,e,n);
+        banMo.push_back(c);
 
-    int c=maHoa(m,e,n);
-    int banRo =giaiMa(c,d,n);
-    cout<<"ban ro goc:"<<m<<endl;
-    cout<<"Ma hoa:"<<c<<endl;
-    cout<<"Giai ma:"<<banRo<<endl;
+        long long banro = giaiMa(c,d,n);
+        banRo.push_back(banro);
+
+    }
+    cout<<"ban mo:";
+    for(long long c:banMo)
+        cout<<char(c);
+    cout<<endl;
+
+    cout<<"ban giai ma:";
+    for(long long z :banRo)
+        cout<<char(z);
+    cout<<endl;
+
 
 }
